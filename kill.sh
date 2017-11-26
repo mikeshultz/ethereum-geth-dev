@@ -1,1 +1,1 @@
-docker kill $(docker ps -a -q  --filter ancestor=ethereum/geth --filter status=running)
+docker rmi $(docker images | grep "^<none>" | awk "{print $3}")
