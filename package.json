@@ -6,6 +6,6 @@
     "web3": "^0.17.0-alpha"
   },
   "script": {
-    "start": "node dist/app.js"
+    "start": "node app/test.js"
   }
 }

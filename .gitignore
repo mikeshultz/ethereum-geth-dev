@@ -1,1 +1,4 @@
 datadir
+.idea
+keystore
+node_modules
