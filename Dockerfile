@@ -37,7 +37,6 @@ RUN apt-get update && \
     apt-get update
 
 RUN apt-get install -y git
-RUN npm i -g coffee-script
 
 WORKDIR /app
 
@@ -48,15 +47,12 @@ RUN npm i
 ADD config /app/config
 # RUN ls (add/change this line if you want to regenerate a naw address)
 
-RUN for i in $(seq 1 $GETH_ACCOUNT_TOTAL); do geth --datadir . --password config/password.txt account new; done
-# RUN geth account list (for verification)
 
-ADD coffeeify /app
 ADD prepare_genesis /app
 
-ADD *.coffee /app
-ADD lib /app
-RUN ./coffeeify
+RUN for i in $(seq 1 $GETH_ACCOUNT_TOTAL); do geth --datadir . --password config/password.txt account new; done
+
+RUN geth  --datadir . account list
 
 RUN ./prepare_genesis
 # Apparently `account new` will create a DB with an incompatible block
@@ -70,8 +66,12 @@ RUN cat ./config/genesis.json
 # "--ipcpath", "/datadir/geth.ipc", 
 # VOLUME /datadir
 
+ADD app/ /app/js
+
 EXPOSE 8545
 EXPOSE 30303
 # TODO - check: port 30303 needed?
 
-ENTRYPOINT ["/usr/bin/geth", "--netrestrict", "127.0.0.1/8", "--datadir", ".", "--password", "config/password.txt", "--unlock", "0,1,2,3,4", "--rpc", "--rpcaddr", "0.0.0.0", "js", "./dist/geth_mine.js"]
+RUN ls -al
+
+CMD ["/usr/bin/geth",  "--netrestrict", "127.0.0.1/8", "--datadir", ".", "--password", "config/password.txt", "--unlock", "0,1,2,3,4", "--rpc", "--rpcaddr", "0.0.0.0", "--rpc", "--rpccorsdomain", "http://localhost:8000", "js", "./js/mining.js"]
